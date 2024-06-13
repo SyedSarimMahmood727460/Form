@@ -181,29 +181,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="modal fade" id="myModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                
-                    <div class="modal-header">
-                        <h4 class="modal-title">Profile Picture</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <img src="" alt="Profile Picture" class="modal-profile-img img-fluid">
-                    </div>
-                    <div class="modal-footer">
-                        <form id="updatePictureForm" method="post" enctype="multipart/form-data">
-                            <label class="form-label" for="profile">Upload your new Profile Picture</label><br>
-                            <input style=" padding: 5px;" type="file" id="profile" name="profile"><br><br>
-                            <button style="display: none;" type="button" class="btn btn-primary updatePicturebtn">Update Picture</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
 
     <!--Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -527,12 +504,23 @@
         $(document).ready(function(){
             $(document).on("click", "a.profile-link", function()
             {
+                clearInputFields();
                 var src = $(this).find('.profile-img').attr('src');
                 $(".modal-profile-img").attr('src', src);
                 $("#myModal").modal();
                 
             });
         });
+
+
+        //clear the image upload input field
+        var modal = document.getElementById('myModal');
+        var inputFields = modal.querySelectorAll('input[type="file"]');
+        function clearInputFields() {
+            inputFields.forEach(function(input) {
+                input.value = ''; 
+            });
+            }
 
 
     </script>
