@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <title>Contact</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                type: "GET",
+                url: "isLoggedin.php",
+                dataType: "json",
+                success: function(response) {
+                    if (response === 'true') 
+                    {
+                        
+                        $(document).ready(function() {
+                            $.ajax({
+                                type: "GET",
+                                url: "loggedinUser.php",
+                                dataType: "json",
+                                success: function(response) 
+                                {
+                                    if(response.status === 'notFound')
+                                    {
+                                        window.location.href = "./userProfile.html";
+                                    }
+                                    else if(response.status === 'Found')
+                                    {
+                                        $('body').css('display', 'block');
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error("Error occurred: " + error);
+                                }
+                            });
+                        });
+                    }
+                    else
+                    {
+                        window.location.href = "./login.html";
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred: " + error);
+                }
+            });
+        });
+    </script>
+    <style>
+        .modal-content {
+            border-radius: 8px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4),
+                        0 0 20px 4px rgba(0, 123, 255, 0.7),
+                        0 0 30px 10px rgba(255, 0, 0, 0.5),
+                        0 0 40px 20px rgba(0, 255, 0, 0.4);
+                        
+        }
+        .modal-header {
+            border-bottom: none;
+            background-color: #007bff;
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+        }
+        .modal-footer {
+            border-top: none;
+        }
+        .form-group label {
+            font-size: 1.25rem;
+        }
+        /* .btn-primary {
+            font-size: 1.25rem;
+            background-color: #007bff;
+            border-color: #007bff;
+        } */
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .input-group .form-control, .input-group .btn {
+            height: 100%;
+        }
+        .input-group .form-control {
+            height: calc(2.25rem + 2px);
+        }
+        .input-group .btn {
+            height: calc(2.25rem + 2px);
+        }
+        /* .modal-dialog {
+            max-width: 600px;
+        }
+        .modal-profile-img {
+            display: block;
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2),
+                        0 0 10px 2px rgba(0, 123, 255, 0.5),
+                        0 0 15px 5px rgba(255, 0, 0, 0.3),
+                        0 0 20px 10px rgba(0, 255, 0, 0.2);
+        }
+        .form-label {
+            font-weight: bold;
+            background-color: lightgoldenrodyellow;
+            padding: 2%;
+            display: inline-block;
+            margin-bottom: 10px;
+        } */
+    </style>
+</head>
+<body style="display: none;">
+    <div class="d-flex justify-content-center align-items-center py-3">
+        <h1 class="m-0">All Users Contact</h1>
+        <button id="logoutBtn" class="btn btn-danger ml-5">Log out</button>
+    </div>
+    <!-- <div style=" text-align: center;">
+        <input style="margin-bottom: 13px; padding: 5px;" type="text" id="searchInput" placeholder="Search...">
+    </div> -->
+    <div class="container mt-3 mb-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <div id="container" style="width:99%; padding-left: 1%;">
+        <table id="contactTable" class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th>Picture</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Date of Birth</th>
+                    <th>Telephone</th>
+                    <th>Age</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="contactTableBody">
+                    <!-- Table content will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+        <!--Image Modal -->
+        <div class="modal fade" id="myModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                
+                    <div class="modal-header">
+                        <h4 class="modal-title">Profile Picture</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <img src="" alt="" class="modal-profile-img img-fluid">
+                    </div>
+                    <div class="modal-footer">
+                        <form id="updatePictureForm" method="post" enctype="multipart/form-data">
+                            <label style="font-weight: bold; padding: 2%; background-color: lightgoldenrodyellow;" for="profile">Upload your new Profile Picture</label><br>
+                            <input style=" padding: 5px;"  type="file" id="profile" name="profile"><br><br>
+                            <button style="display: none;"  type="button" class="btn btn-primary updatePicturebtn">Update Picture</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="modal fade" id="myModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                
+                    <div class="modal-header">
+                        <h4 class="modal-title">Profile Picture</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <img src="" alt="Profile Picture" class="modal-profile-img img-fluid">
+                    </div>
+                    <div class="modal-footer">
+                        <form id="updatePictureForm" method="post" enctype="multipart/form-data">
+                            <label class="form-label" for="profile">Upload your new Profile Picture</label><br>
+                            <input style=" padding: 5px;" type="file" id="profile" name="profile"><br><br>
+                            <button style="display: none;" type="button" class="btn btn-primary updatePicturebtn">Update Picture</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+
+    <!--Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="fname">First Name</label>
+                                    <input type="text" class="form-control" id="fname" name="fname" placeholder="Enter First Name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="lname">Last Name</label>
+                                    <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter Last Name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone_number">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="+923012345678" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth">Date of Birth</label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter Full Address" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary saveChangesBtn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <script>
+        //checking for expiry
+        setInterval(function() {
+            if (!getCookie("UserEmail")) {
+                $.ajax({
+                    url: 'logout.php', 
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            window.location.href = "./login.html";
+                        } else {
+                            console.log('Logout failed');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error during logout:', error);
+                    }
+                });
+            }
+            console.log("Refreash");
+        }, 15000);
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+        // search
+        $(document).ready(function() {
+            $('#searchButton').on('click', function() {
+                var value = $('#searchInput').val().toLowerCase();
+                $('#contactTable tbody tr').each(function() {
+                    var name = $(this).find('td:eq(1)').text().toLowerCase();
+                    var email = $(this).find('td:eq(2)').text().toLowerCase();
+                    var phone = $(this).find('td:eq(5)').text().toLowerCase();
+                    if (name.indexOf(value) > -1 || email.indexOf(value) > -1 || phone.indexOf(value) > -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+
+
+
+
+        //update image
+        $(document).ready(function() {
+            
+            $('#profile').change(function() {
+                var storedImage = $('.modal-profile-img').attr('src');
+                $('.updatePicturebtn').click(function(event) {
+                    event.preventDefault();
+            
+                    var formData = new FormData(); 
+                    formData.append('storedImage', storedImage);
+                    formData.append('profileImage', $('#profile')[0].files[0]);
+                    $.ajax({
+                        url: 'updatePicture.php',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function(response) 
+                        {
+                            console.log(response);
+                            if(response.status === 'success')
+                            {
+                                window.location.href = "./Dashboard.html";
+                            }
+                            else
+                            {
+                                console.log("No");
+                            }
+                        },
+                        error: function(xhr, status, error) 
+                        {
+
+                            console.error('Error:', error);
+                        }
+                    });
+                    
+                });
+                
+            });
+        });
+
+
+        //show button on file upload
+        document.getElementById("profile").addEventListener("change", function() 
+        {
+            var fileInput = document.getElementById('profile');
+            var saveChangesBtn = document.querySelector('.updatePicturebtn');
+            
+            if (fileInput.files.length > 0) 
+            {
+                saveChangesBtn.style.display = 'block';
+            } 
+            else 
+            {
+                saveChangesBtn.style.display = 'none';
+            }
+        });
+
+        
+        //display contacts
+        $(document).ready(function() {
+            $.ajax({
+                url: 'Dashboard.php', 
+                method: 'GET', 
+                dataType: 'json', 
+                success: function(response) {
+
+                    if (response.length > 0) {
+                        var tableBody = $('#contactTableBody');
+                        tableBody.empty();
+                        $.each(response, function(index, row) 
+                        {
+                            var newRow = '<tr>' +
+                                '<td><a href="#" class="profile-link"><img src="' + row.profile + '" alt="" width="50" height="50" style="border-radius: 50%;" class="profile-img"></a></td>'+
+                                '<td>' + row.first_name + ' ' + row.last_name + '</td>' +
+                                '<td>' + row.email + '</td>' +
+                                '<td>' + row.address + '</td>' +
+                                '<td>' + row.date_of_birth + '</td>' +
+                                '<td>' + row.telephone + '</td>' +
+                                '<td>' + row.age + '</td>' +
+                                '<td style="display:flex; gap:10px; padding:10px;">' +
+                                '<button class="btn btn-info editBtn" data-email="' + row.email + '" data-firstname="' + row.first_name + '" data-lastname="' + row.last_name + '" data-phone="' + row.telephone + '" data-dob="' + row.date_of_birth + '" data-address="' + row.address + '">Edit</button>' +
+
+                                '<button class="btn btn-danger deleteBtn" data-email="' + row.email + '">Delete</button>' +
+                                '</td>' +
+                                '</tr>';
+                            tableBody.append(newRow);
+                        });
+                    } 
+                    else {
+                        
+                        $('#container').html('<div class="alert alert-danger text-center font-weight-bold" style="font-size: large;">No Contacts found.</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
+
+            //logout
+            $('#logoutBtn').click(function() {
+                $.ajax({
+                    url: 'logout.php', 
+                    type: 'POST',
+                    data:{data:"sarim"},
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            window.location.href = "./login.html";
+                        } else {
+                            console.log('Logout failed');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error during logout:', error);
+                    }
+                });
+            });
+
+            //edit
+            $('#contactTableBody').on('click', '.editBtn', function() {
+                var email = $(this).data('email');
+                var firstName = $(this).data('firstname');
+                var lastName = $(this).data('lastname');
+                var phone = $(this).data('phone');
+                var dob = $(this).data('dob');
+                var address = $(this).data('address');
+
+                $('#editModal #fname').val(firstName);
+                $('#editModal #lname').val(lastName);
+                $('#editModal #phone_number').val(phone);
+                $('#editModal #date_of_birth').val(dob);
+                $('#editModal #address').val(address);
+                $('#editModal .saveChangesBtn').val(email);
+                $('#editModal').modal('show');
+ 
+            });
+
+
+            //delete
+            $('#contactTableBody').on('click', '.deleteBtn', function() {
+                var email = $(this).data('email');
+    
+                $.ajax({
+                    url: 'deleteUser.php', 
+                    type: 'POST',
+                    data: { email: email }, 
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status==='success')
+                        {
+                            window.location.href = "./Dashboard.html";
+                        }
+                        else
+                        {
+                            console.log('error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        
+                        console.error('Error deleting user:', error);
+                    }
+                });
+            });
+        
+
+
+        //SAVE EDIT
+        $('#editModal').on('click', '.saveChangesBtn', function() {
+           
+            var email = $('#editModal .saveChangesBtn').val();
+            var firstName = $('#editModal #fname').val();
+            var lastName = $('#editModal #lname').val();
+            var phone = $('#editModal #phone_number').val();
+            var dob = $('#editModal #date_of_birth').val();
+            var address = $('#editModal #address').val();
+
+
+            $.ajax({
+                url: 'updateUserProfile.php', 
+                type: 'POST',
+                data: {
+                        email: email,
+                        firstName: firstName,
+                        lastName: lastName,
+                        phone: phone,
+                        dob: dob,
+                        address: address
+                },
+                dataType: 'json',
+                success: function(response) 
+                {
+                    console.log(response);
+                    if(response.status === 'success') 
+                    {
+                        $('#editModal').modal('hide');
+                        window.location.href = "./Dashboard.html";
+                    } 
+                    else 
+                    {
+                        console.log('Error: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) 
+                {
+                    console.error('Error updating user data:', error);
+                }
+            });
+        });
+
+
+        //image modal open
+        $(document).ready(function(){
+            $(document).on("click", "a.profile-link", function()
+            {
+                var src = $(this).find('.profile-img').attr('src');
+                $(".modal-profile-img").attr('src', src);
+                $("#myModal").modal();
+                
+            });
+        });
+
+
+    </script>
+</body>
+</html>
