@@ -5,13 +5,13 @@ $response = array();
 $dbConnection = new mysqli($servername, $username, $password, $dbname);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    $email = $_POST['contactemail'];
     $first_name=$_POST['fname'];
-    $last=$_POST['lname'];
+    $last_name=$_POST['lname'];
     $address = $_POST['address'];
-    $date = $_POST['date_of_birth'];
     $phone = $_POST['phone_number'];
-    $age = $_POST['age'];
     $file = $_FILES["profile"]["name"];
+    $loginUseremail = $_COOKIE['UserEmail'];
     
     $imageType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
     $unique_name = date('Ymd_His') . '_' . uniqid();
@@ -24,24 +24,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (move_uploaded_file($tempName, $storage)) 
     {
-        $email = $_COOKIE['UserEmail'];
-        
-        $alreadyEmailQuery = "SELECT COUNT(*) as count FROM Contact WHERE email = ?";
+        $alreadyEmailQuery = "SELECT COUNT(*) as count FROM Contact WHERE email = ? and userEmail=?";
         $stmt = $dbConnection->prepare($alreadyEmailQuery);
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("ss", $email,$loginUseremail);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
     
         if ($row['count'] > 0) {
             $response['status'] = 'Found';
-            $response['message'] = 'User with this email already exists';
+            $response['message'] = 'Contact with this email already exists';
         } 
         else 
         {
-            $sql = "INSERT INTO Contact (first_name, last_name, email, address, date_of_birth, telephone, age, profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO Contact (first_name, last_name, email, address, telephone, profile,userEmail) VALUES (?,?,?,?,?,?,?)";
             $stmt = $dbConnection->prepare($sql);
-            $stmt->bind_param("ssssssis", $first_name, $last, $email, $address, $date, $phone, $age, $storage);
+            $stmt->bind_param("sssssss", $first_name, $last_name, $email, $address, $phone, $storage,$loginUseremail);
             $stmt->execute();
             $response['status'] = 'success';
             $response['message'] = 'Information Saved';

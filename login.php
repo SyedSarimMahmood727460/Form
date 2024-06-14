@@ -15,9 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $dataFromemail = "SELECT email,password from user where email=?";
-    $alreadyEmail = "SELECT COUNT(*) as count from Contact where email = '$email'";
-    $result = mysqli_query($dbConnection,$alreadyEmail);
-    $row = mysqli_fetch_assoc($result);
+    // $alreadyEmail = "SELECT COUNT(*) as count from Contact where email = '$email'";
+    // $result = mysqli_query($dbConnection,$alreadyEmail);
+    // $row = mysqli_fetch_assoc($result);
 
     $stmt = $dbConnection->prepare($dataFromemail);
     $stmt->bind_param("s", $email);
@@ -30,6 +30,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
         if (password_verify($userpassword, $passwordResult)) 
         {
+            setCookies($rememberMe,$email);
+            $response['status'] = 'success';
+            $response['message'] = 'Logged in';
             // $session_id=bin2hex(random_bytes(16));
             // $_SESSION['session_id'] = $session_id;
             //$_SESSION['session_email'] = $email;
@@ -37,19 +40,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // $sql = "INSERT INTO session (userEmail, sessionID) VALUES ('$email', '$session_id')";
             // $dbConnection->query($sql);
             
-            if($row['count'] > 0)
-            {
-                setCookies($rememberMe,$email) ;
-                $response['status'] = 'success';
-                $response['message'] = 'Logged in';
+            // if($row['count'] > 0)
+            // {
+            //     setCookies($rememberMe,$email);
+            //     $response['status'] = 'success';
+            //     $response['message'] = 'Logged in';
                 
-            }
-            else
-            {
-                setCookies($rememberMe,$email) ;
-                $response['status'] = 'notExist';
-                $response['message'] = 'Logged in';
-            }
+            // }
+            // else
+            // {
+            //     setCookies($rememberMe,$email) ;
+            //     $response['status'] = 'notExist';
+            //     $response['message'] = 'Logged in';
+            // }
         } 
         else 
         {
@@ -61,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else
     {
         $response['status'] = 'notFound';
-        $response['message'] = 'User With this email not found, Try to log in';
+        $response['message'] = 'User With this email not found, Kindly Sign up';
     }
     $stmt->close();
     $dbConnection->close();

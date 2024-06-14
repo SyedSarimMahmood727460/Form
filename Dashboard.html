@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <title>Contact</title>
+    <title>Contact Dashboard</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- js scripts -->
     <script>
+        
+        //checking logged in or not
         $(document).ready(function() {
             $.ajax({
                 type: "GET",
@@ -16,28 +20,7 @@
                 success: function(response) {
                     if (response === 'true') 
                     {
-                        
-                        $(document).ready(function() {
-                            $.ajax({
-                                type: "GET",
-                                url: "loggedinUser.php",
-                                dataType: "json",
-                                success: function(response) 
-                                {
-                                    if(response.status === 'notFound')
-                                    {
-                                        window.location.href = "./userProfile.html";
-                                    }
-                                    else if(response.status === 'Found')
-                                    {
-                                        $('body').css('display', 'block');
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    console.error("Error occurred: " + error);
-                                }
-                            });
-                        });
+                        $('body').css('display', 'block');
                     }
                     else
                     {
@@ -50,7 +33,20 @@
             });
         });
     </script>
+
+    <!-- styles -->
     <style>
+        
+        tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0f9f0; 
+        }
+
+
+
         .modal-content {
             border-radius: 8px;
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4),
@@ -75,11 +71,6 @@
         .form-group label {
             font-size: 1.25rem;
         }
-        /* .btn-primary {
-            font-size: 1.25rem;
-            background-color: #007bff;
-            border-color: #007bff;
-        } */
         .btn-primary:hover {
             background-color: #0056b3;
             border-color: #0056b3;
@@ -93,37 +84,38 @@
         .input-group .btn {
             height: calc(2.25rem + 2px);
         }
-        /* .modal-dialog {
-            max-width: 600px;
+        #error-message {
+            position: absolute;
+            top: 16%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-        .modal-profile-img {
-            display: block;
-            margin: 20px auto;
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2),
-                        0 0 10px 2px rgba(0, 123, 255, 0.5),
-                        0 0 15px 5px rgba(255, 0, 0, 0.3),
-                        0 0 20px 10px rgba(0, 255, 0, 0.2);
-        }
-        .form-label {
+        #error-messages {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-weight: bold;
-            background-color: lightgoldenrodyellow;
-            padding: 2%;
-            display: inline-block;
-            margin-bottom: 10px;
-        } */
+        }
     </style>
+
+
 </head>
 <body style="display: none;">
-    <div class="d-flex justify-content-center align-items-center py-3">
+    <!-- modal error message -->
+    <div id="error-message" class="alert alert-danger login-container" style="font-weight: bold; display: none; text-align: center;"></div>
+    
+    <!-- all user heading and logout -->
+    <div class="d-flex  justify-content-center align-items-center py-3">
         <h1 class="m-0">All Users Contact</h1>
-        <button id="logoutBtn" class="btn btn-danger ml-5">Log out</button>
+        <div >
+            <button id="logoutBtn" class="btn btn-danger ml-5">Log out</button>
+            
+        </div>
+        
     </div>
-    <!-- <div style=" text-align: center;">
-        <input style="margin-bottom: 13px; padding: 5px;" type="text" id="searchInput" placeholder="Search...">
-    </div> -->
+
+    <!-- serch and add -->
     <div class="container mt-3 mb-3">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -131,35 +123,44 @@
                     <input type="text" class="form-control" id="searchInput" placeholder="Search...">
                     <div class="input-group-append">
                         <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+                        
                     </div>
                 </div>
+            </div>
+            <div>
+                <button id="AddBtn" class="btn btn-success ml-3">Add Contact</button>
             </div>
         </div>
     </div>
     
     
+    <!-- error message -->
+    <div style="display: flex; justify-content: center;">
+        <div id="error-messages" class="alert alert-danger login-container" style=" width: 30%; display: none; margin-bottom: 20px; text-align: center;"> No Contact found with this search</div>
+    </div>
 
+    <!-- Table -->
     <div id="container" style="width:99%; padding-left: 1%;">
         <table id="contactTable" class="table">
-            <thead class="thead-light">
+            <thead class="thead-dark">
                 <tr>
                     <th>Picture</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Address</th>
-                    <th>Date of Birth</th>
                     <th>Telephone</th>
-                    <th>Age</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="contactTableBody">
+                
                     <!-- Table content will be dynamically added here -->
             </tbody>
         </table>
     </div>
-        <!--Image Modal -->
-        <div class="modal fade" id="myModal">
+
+    <!--Image Modal -->
+    <div class="modal fade" id="myModal">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                 
@@ -180,7 +181,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
 
     <!--Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -217,8 +218,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="date_of_birth">Date of Birth</label>
-                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
                             </div>
                         </div>
@@ -234,6 +235,72 @@
             </div>
         </div>
     </div>
+
+    <!-- Add contact modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Add new Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="userProfileForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="profile">User Profile</label>
+                                    <input type="file" accept="image/*" class="form-control-file" id="profile" name="profile" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="fname">First Name</label>
+                                    <input type="text" class="form-control" id="fname" name="fname" placeholder="Enter First Name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="lname">Last Name</label>
+                                    <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter Last Name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone_number">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="+923012345678" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="contactemail">User Email</label>
+                                    <input type="email" class="form-control" id="contactemail" name="contactemail" placeholder="Enter Email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter Full Address" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary addsaveBtn">Save Contact</button>
+                        </div>
+                    </form>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+
+
+
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -259,7 +326,6 @@
                     }
                 });
             }
-            console.log("Refreash");
         }, 15000);
         function getCookie(name) {
             var value = "; " + document.cookie;
@@ -267,25 +333,96 @@
             if (parts.length == 2) return parts.pop().split(";").shift();
         }
 
-        // search
+        //Add new modal
+        $(document).ready(function(){
+            $(document).on("click", "#AddBtn", function()
+            {
+                $("#addModal").modal();
+                
+            });
+        });
+
+        // save add new contact
+        $(document).ready(function(){
+            $('#userProfileForm').submit(function(event){
+                event.preventDefault(); 
+
+                if(true)
+                {
+                    var formData = new FormData(this);
+                    $.ajax({
+                        url: 'addContact.php',
+                        type: 'POST',
+                        data:formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success:function(response)
+                        {
+                            if(response.status === 'Found')
+                            {
+                                $("#error-message").html(response.message).show();
+                                $(document).ready(function(){
+                                    setTimeout(function(){
+                                        $("#error-message").hide();
+                                    }, 3000); 
+                                });
+                            }
+                            else if(response.status === 'success')
+                            {
+                                window.location.href = "./Dashboard.html";
+                            }
+                            else if(response.status === 'fail')
+                            {
+                                console.log("No");
+                            }
+                            else
+                            {
+                                console.log("no");
+                            }
+                        },
+                        error: function(xhr, status, error) 
+                        {
+                            console.error(error); 
+                        }
+                    });
+                }
+               
+            });
+        });
+
+        // search field
         $(document).ready(function() {
             $('#searchButton').on('click', function() {
+                searchTable();
+            });
+
+            $('#searchInput').on('keyup', function(event) {
+                if (event.keyCode === 13) { // 13 is the Enter key code
+                    searchTable();
+                }
+            });
+
+            function searchTable() {
                 var value = $('#searchInput').val().toLowerCase();
                 $('#contactTable tbody tr').each(function() {
                     var name = $(this).find('td:eq(1)').text().toLowerCase();
                     var email = $(this).find('td:eq(2)').text().toLowerCase();
                     var phone = $(this).find('td:eq(5)').text().toLowerCase();
-                    if (name.indexOf(value) > -1 || email.indexOf(value) > -1 || phone.indexOf(value) > -1) {
+                    if (name.indexOf(value) > -1 || email.indexOf(value) > -1 || phone.indexOf(value) > -1) 
+                    {
+                        $("#error-messages").hide();
                         $(this).show();
-                    } else {
+
+                    } 
+                    else 
+                    {
+                        $("#error-messages").show();
                         $(this).hide();
                     }
                 });
-            });
+            }
         });
-
-
-
 
         //update image
         $(document).ready(function() {
@@ -329,7 +466,6 @@
             });
         });
 
-
         //show button on file upload
         document.getElementById("profile").addEventListener("change", function() 
         {
@@ -345,7 +481,6 @@
                 saveChangesBtn.style.display = 'none';
             }
         });
-
         
         //display contacts
         $(document).ready(function() {
@@ -365,10 +500,8 @@
                                 '<td>' + row.first_name + ' ' + row.last_name + '</td>' +
                                 '<td>' + row.email + '</td>' +
                                 '<td>' + row.address + '</td>' +
-                                '<td>' + row.date_of_birth + '</td>' +
                                 '<td>' + row.telephone + '</td>' +
-                                '<td>' + row.age + '</td>' +
-                                '<td style="display:flex; gap:10px; padding:10px;">' +
+                                '<td style="display:flex; gap:10px;">' +
                                 '<button class="btn btn-info editBtn" data-email="' + row.email + '" data-firstname="' + row.first_name + '" data-lastname="' + row.last_name + '" data-phone="' + row.telephone + '" data-dob="' + row.date_of_birth + '" data-address="' + row.address + '">Edit</button>' +
 
                                 '<button class="btn btn-danger deleteBtn" data-email="' + row.email + '">Delete</button>' +
@@ -377,7 +510,8 @@
                             tableBody.append(newRow);
                         });
                     } 
-                    else {
+                    else 
+                    {
                         
                         $('#container').html('<div class="alert alert-danger text-center font-weight-bold" style="font-size: large;">No Contacts found.</div>');
                     }
@@ -388,105 +522,113 @@
             });
         });
 
-            //logout
-            $('#logoutBtn').click(function() {
-                $.ajax({
-                    url: 'logout.php', 
-                    type: 'POST',
-                    data:{data:"sarim"},
-                    dataType: 'json',
-                    success: function(response) {
-                        if(response.status === 'success') {
-                            window.location.href = "./login.html";
-                        } else {
-                            console.log('Logout failed');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error during logout:', error);
+        //logout
+        $('#logoutBtn').click(function() {
+            $.ajax({
+                url: 'logout.php', 
+                type: 'POST',
+                data:{data:"sarim"},
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                           window.location.href = "./login.html";
+                    } else {
+                        console.log('Logout failed');
                     }
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error during logout:', error);
+                }
             });
+        });
 
-            //edit
-            $('#contactTableBody').on('click', '.editBtn', function() {
-                var email = $(this).data('email');
-                var firstName = $(this).data('firstname');
-                var lastName = $(this).data('lastname');
-                var phone = $(this).data('phone');
-                var dob = $(this).data('dob');
-                var address = $(this).data('address');
+        //edit modal, show data in input fields for updation
+        $('#contactTableBody').on('click', '.editBtn', function() {
+            var email = $(this).data('email');
+            var firstName = $(this).data('firstname');
+            var lastName = $(this).data('lastname');
+            var phone = $(this).data('phone');
+            var dob = $(this).data('dob');
+            var address = $(this).data('address');
 
-                $('#editModal #fname').val(firstName);
-                $('#editModal #lname').val(lastName);
-                $('#editModal #phone_number').val(phone);
-                $('#editModal #date_of_birth').val(dob);
-                $('#editModal #address').val(address);
-                $('#editModal .saveChangesBtn').val(email);
-                $('#editModal').modal('show');
+            $('#editModal #fname').val(firstName);
+            $('#editModal #email').val(email);
+            $('#editModal #lname').val(lastName);
+            $('#editModal #phone_number').val(phone);
+            $('#editModal #address').val(address);
+            $('#editModal .saveChangesBtn').val(email);
+            $('#editModal').modal('show');
  
-            });
+        });
 
 
-            //delete
-            $('#contactTableBody').on('click', '.deleteBtn', function() {
-                var email = $(this).data('email');
+        //delete
+        $('#contactTableBody').on('click', '.deleteBtn', function() {
+            var email = $(this).data('email');
     
-                $.ajax({
-                    url: 'deleteUser.php', 
-                    type: 'POST',
-                    data: { email: email }, 
-                    dataType: 'json',
-                    success: function(response) {
-                        if(response.status==='success')
-                        {
-                            window.location.href = "./Dashboard.html";
-                        }
-                        else
-                        {
-                            console.log('error');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        
-                        console.error('Error deleting user:', error);
+            $.ajax({
+                url: 'deleteUser.php', 
+                type: 'POST',
+                data: { email: email }, 
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status==='success')
+                    {
+                        window.location.href = "./Dashboard.html";
                     }
-                });
+                    else
+                    {
+                        console.log('error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                        
+                    console.error('Error deleting user:', error);
+                }
             });
+        });
         
 
 
-        //SAVE EDIT
+        //SAVE new edited values
         $('#editModal').on('click', '.saveChangesBtn', function() {
            
             var email = $('#editModal .saveChangesBtn').val();
             var firstName = $('#editModal #fname').val();
+            var updatedEmail = $('#editModal #email').val();
             var lastName = $('#editModal #lname').val();
             var phone = $('#editModal #phone_number').val();
-            var dob = $('#editModal #date_of_birth').val();
             var address = $('#editModal #address').val();
 
 
             $.ajax({
-                url: 'updateUserProfile.php', 
+                url: 'editUserProfile.php', 
                 type: 'POST',
                 data: {
+                    updatedEmail:updatedEmail,
                         email: email,
                         firstName: firstName,
                         lastName: lastName,
                         phone: phone,
-                        dob: dob,
                         address: address
                 },
                 dataType: 'json',
                 success: function(response) 
                 {
-                    console.log(response);
-                    if(response.status === 'success') 
+                    if(response.status === 'updated') 
                     {
                         $('#editModal').modal('hide');
                         window.location.href = "./Dashboard.html";
-                    } 
+                    }
+                    else if(response.status === 'exist')
+                    {
+                        $("#error-message").html(response.message).show();
+                        $(document).ready(function(){
+                            setTimeout(function(){
+                                $("#error-message").hide();
+                            }, 3000); 
+                        });
+                    }
                     else 
                     {
                         console.log('Error: ' + response.message);
@@ -520,8 +662,7 @@
             inputFields.forEach(function(input) {
                 input.value = ''; 
             });
-            }
-
+        }
 
     </script>
 </body>
