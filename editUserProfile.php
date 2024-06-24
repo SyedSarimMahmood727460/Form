@@ -12,20 +12,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST['phone'];
     $address = $_POST['address'];
     $updatedEmail = $_POST['updatedEmail'];
-    
+    $loginUseremail = $_COOKIE['UserEmail'];
+  
 
-    $alreadyEmail = "SELECT COUNT(*) as count from Contact where email = '$updatedEmail'";
-    $result = mysqli_query($dbConnection,$alreadyEmail);
-    $row = mysqli_fetch_assoc($result);
-
-    if($row['count'] > 0)
+    if($updatedEmail != $email)
     {
-        $response['status'] = 'exist';
-        $response['message'] = 'Contact with this email already exists';
+        $alreadyEmail = "SELECT COUNT(*) as count from Contact where email = '$updatedEmail' and userEmail='$loginUseremail'";
+        $result = mysqli_query($dbConnection,$alreadyEmail);
+        $row = mysqli_fetch_assoc($result);
+
+        if($row['count'] > 0)
+        {
+            $response['status'] = 'exist';
+            $response['message'] = 'Contact with this email already exists';
+        }
+        else
+        {
+            $sql = "UPDATE Contact SET first_name='$firstName',last_name='$lastName',email ='$updatedEmail',address='$address',telephone = '$phone' WHERE email='$email' and userEmail='$loginUseremail'";
+            if ($dbConnection->query($sql) === TRUE) 
+            {
+                $response['status'] = 'updated';
+            } 
+            else 
+            {
+                echo "Error updating record: " . $dbConnection->error;
+            }
+        
+        }
     }
     else
     {
-        $sql = "UPDATE Contact SET first_name='$firstName',last_name='$lastName',email ='$updatedEmail',address='$address',telephone = '$phone'  WHERE email='$email'";
+        $sql = "UPDATE Contact SET first_name='$firstName',last_name='$lastName',email ='$updatedEmail',address='$address',telephone = '$phone'  WHERE email='$email' and userEmail='$loginUseremail'";
         if ($dbConnection->query($sql) === TRUE) 
         {
             $response['status'] = 'updated';
@@ -34,8 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         {
             echo "Error updating record: " . $dbConnection->error;
         }
-       
     }
+    
     
 }
 echo json_encode($response);

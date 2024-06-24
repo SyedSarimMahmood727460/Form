@@ -1,5 +1,9 @@
 <?php
 include_once("db_connection.php");
+require 'vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 session_start();
 $response = array();
 $dbConnection = new mysqli($servername, $username, $password, $dbname);
@@ -41,8 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $dbConnection->prepare($sql);
             $stmt->bind_param("sssssss", $first_name, $last_name, $email, $address, $phone, $storage,$loginUseremail);
             $stmt->execute();
+           
+           
             $response['status'] = 'success';
             $response['message'] = 'Information Saved';
+            mailSend($first_name,$last_name,$email,$phone,$address,$storage);
         }
     }
     
@@ -53,6 +60,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
    
     echo json_encode($response);
+}
+
+function mailSend($first_name,$last_name,$email,$phone,$address,$storage)
+{
+    //Create an instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+
+    try {
+        //Server settings                   //Enable verbose debug output
+        $mail->isSMTP();                                            //Send using SMTP
+        $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+        $mail->Username   = 'sarimmahmood78@gmail.com';                     //SMTP username
+        $mail->Password   = 'voxvknjkdtfxoipm';                               //SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //ENCRYPTION_SMTPS-465 Enable implicit TLS encryption
+        $mail->Port       = 587;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+        //Recipients
+        $mail->setFrom('sarimmahmood78@gmail.com', 'Admin');
+        $mail->addAddress('syedsarimmahmood9@gmail.com', 'Username');     //Add a recipient
+
+        //Attachments
+        // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+        $mail->addAttachment($storage, 'profilePicture');    //Optional name
+
+        //Content
+        $mail->isHTML(true);                                  //Set email format to HTML
+        $mail->Subject = 'New Contact Added';
+        $mail->Body = '<h3>New Contact Details</h3>
+        <p>First Name: ' . $first_name . '</p>
+        <p>Last Name: ' . $last_name . '</p>
+        <p>Email: ' . $email . '</p>
+        <p>Phone Number: ' . $phone . '</p>
+        <p>Address: ' . $address . '</p>';
+
+        $mail->send();
+    } 
+    catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
 }
 
     

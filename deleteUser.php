@@ -6,10 +6,11 @@ $response =array();
 if ($_SERVER["REQUEST_METHOD"] == "POST") 
 {
     $email = $_POST['email'];
+    $loginUseremail = $_COOKIE['UserEmail'];
 
-    $sql = "DELETE FROM Contact WHERE email='$email'";    
+    $sql = "DELETE FROM Contact WHERE email='$email' and userEmail='$loginUseremail'";    
     //$userDlt = "DELETE FROM user WHERE email='$email'";    
-    $profilesql = "select Profile from Contact WHERE email='$email'";    
+    $profilesql = "SELECT Profile from Contact WHERE email='$email' and userEmail='$loginUseremail'";    
     $result = mysqli_query($dbConnection, $profilesql);
     //  && $dbConnection->query($userDlt)
     if ($result && $dbConnection->query($sql) === TRUE) 
